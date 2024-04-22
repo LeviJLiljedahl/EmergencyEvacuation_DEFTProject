@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Evacuation!</title>
+    <style>
+      body {
+        background-color: #000000;
+        background-image: linear-gradient(to top, #000000, #1F0066);
+        background-repeat: no-repeat;
+        font-family: Verdana, Arial, Sans-serif;
+        font-size: 1.5em;
+      }
+
+      header {
+        background-color: #191B29;
+        background-image: url(lightningHeader.jpg);
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      h1 {
+        color: #FFE601;
+        font-family: Georgia, "Times New Roman", serif;
+        height: 100px;
+        text-align: center;
+        margin: 0px;
+      }
+
+      main {
+        background-color: #676EA8;
+        border: solid;
+        border-color: #FDEDC4;
+        color: #FFFFFF;
+        margin: 0 120px;
+        padding: 20px;
+      }
+
+      footer {
+        background-color: #191B29;
+        background-image: url(lightningHeader.jpg);
+        background-position: center;
+        background-repeat: no-repeat;
+        color: #FFE601;
+        font-size: .75em;
+        font-style: italic;
+        padding: 10px;
+        text-align: center;
+      }
+
+      #wrapper {
+        background-color: #191B29;
+        box-shadow: 10px 10px 10px #FDEDC4;
+        margin: 0 auto;
+        max-width: 1052px;
+        min-width: 960px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper">
+      <header>
+        <h1>Emergency Evacuation!</h1>
+      </header>
+      <main id="output">
+      </main>
+      <script>
+  const output = document.getElementById("output");
+  
+  let sfxThunder = new Audio("thunder.wav");
+
+  let sceneId = "start";
+
+  const newScene = function(theDescription){
+    let result = {};
+    let aChoice = {};
+    result.description = theDescription;
+    result.choices = [];
+    
+    let i = 1;
+    while ( i < arguments.length){
+      aChoice.label = arguments[i];
+      aChoice.onChoose = arguments[i + 1];
+      result.choices[(i-1)/2] = aChoice;
+      aChoice = {};
+      i = i + 2;
+    }
+    
+    return result;
+  };
+      
+  const scenes = {
+    start: newScene(
+                    "<p>You are sitting in your favorite chair watching television on "
+                    + "a rainy afternoon. "
+                    + "You think to yourself that today was a pretty boring day. "
+                    + "You feel a bit guilty becuase another Sunday has come and "
+                    + "gone and, once again, you spent it watching television. "
+                    + "You try to make yourself feel better by telling yourself it "
+                    + "is still better then going to work! "
+                    + "It is at this point that you get up to get a snack from "
+                    + "the kitchen. Just as you enter the kitchen you hear a siren "
+                    + "outside and the television starts to blare a loud warning alarm.</p>",
+                  "Ignore the warnings and look for a good snack.", "ignoreWarnings",
+                  "Head back into the living room to check out the television.", "checkTv",
+                ),
+
+          ignoreWarnings: newScene(
+            "<p>You continue looking for a snack. You find a bag of chips."
+             + " By the time you get back to the Tv, the warning is over.</p>",
+            "Check your phone to see what the warning was.", "checkPhone",
+            "Don't think about what the warning was and keep watching Tv.", "keepTv"
+          ),
+          
+        checkTv: newScene(
+            "<p>You go back to the living room to check the Tv."
+             + " You are shocked at what you see. Your day just became a lot less boring."
+             + " The 'Storm of the Century' is heading directly for your location."
+             + " The warning tells everyone to evacuate the area immediatley.</p>",
+            "You ignore the evacuation warnings and head down to the basement for shelter.", "basement",
+            "You grab a few items and head out to the car to evacuate, as suggested.", "goToCar"
+          ),
+        
+        checkPhone: newScene (
+            "<p>You check your phone. You are shocked at what you see."
+              + " Your day just became a lot less boring."
+              + " The 'Storm of the Century' is heading directly for you location."
+              + " The warning tells everyone to evacuate the area immediatley."
+              + " Hopefully, you are not too late after getting your snack</p>",
+            "You ignore the evacuation warnings and head down to the basement for shelter.", "basement",
+            "You grab a few items and head out to the car to evacuate, as suggested.", "goToCar"
+          ),
+          
+        keepTv: newScene (
+            "<p>You keep watching Tv. You notice that the rain is starting to pickup" 
+            + " a bit outside. After about 30 minutes, you decide to switch channels."
+            + " On this new channel, you finally see what all the noise was about, it"
+            + " was a warning telling people to evacuate due to a massive storm about "
+            + "to hit your town. You have lost 30 minutes by not checking the warning sooner, "
+            + "but there is still time left to act.</p>",
+              "You head to the basement for shelter, thinking it is too late to evacuate.", "basement",
+              "You head out to the car to evacuate, hoping there is still time to escape.", "goToCar"
+          ),
+          
+        basement: newScene(
+            "<p>You go down to the basement to wait out the storm. Luckily, your camping "
+            + "gear is down here. This includes food, water, essentials, and even "
+            + "a portable generator. Before long, however, the rain has gotten so bad "
+            + "that water begins to leak into the basement." 
+            + " Thinking quickly, you decide that you will start up the generator and "
+            + "connect it to a pump that will push the water through a hose and out "
+            + "an upstairs window. However, the generator refuses to start.</p>",
+              "Start bailing the water with a bucket.", "bailWater",
+              "Try fixing the generator, hopefully, it won't take too long.", "fixGen"
+        ),
+        
+        goToCar: newScene(
+          "<p>You have grabbed just the essentials and hope to outrun the storm in your car. "
+          + "The only problem is, your daily driver car is in the shop and all you "
+          + "have here is your old beater. It has been quite a while since you drove it "
+          + "last and you are not sure if it is up to the challenge. The rain is getting stronger.</p>",
+            "Take a few minutes to inspect the car, making sure it will be okay.", "inspectCar",
+            "Forget the inspection and just try to evacuate as soon as possible.", "tryStart"
+        ),
+        
+        bailWater: newScene(
+          "<p>You start bailing the water as fast as you can, running bucket after bucket "
+          + "up stairs and throwing the water out the window. Water continues to leak in "
+          + "faster and faster. After 30 minutes, you are pretty tired, but you feel you are "
+          + "making a difference. But you are not sure how long you can keep up at this pace.</p>",
+            "Keep bailing as fast as you can, hoping the rain will stop soon.", "bailWater30",
+            "Stop bailing and try to fix the generator to help out.", "fixGen30"
+        ),
+        
+        fixGen: newScene(
+          "<p>You decide it is best to try fixing the generator. Luckily, you have all "
+          + "the tools you should need right down in the basement. But it has been quite "
+          + "a while since you ran this generator. You start by taking it apart, looking for "
+          + "any problems. You slowly put it back together, replacing what you can and "
+          + "changing out any parts that need it. Once back together, you try starting it, "
+          + "but no luck. The water is coming in the basement pretty fast now.</p>",
+            "Continue working on the generator, hoping to find a quick fix.", "fixGen30",
+            "Give up on the generator and start bailing water with a bucket.", "lateBail"
+        ),
+        
+        bailWater30: newScene(
+          "<p>You continue to bail water as fast as you can. Finding energy you didn't "
+          + "even know you had. However, the water continues to fill the basement and "
+          + "is now, at least, a few feet deep. It might be just in your mind, but you "
+          + "believe the storm may be letting up, even though water continues to leak in "
+          + "at an alarming pace. </p>",
+            "Continue to bail water, hoping the storm will be done soon.", "bailWater60",
+            "Take time to fix the generator to help with the water.", "fixGen60"
+        ),
+        
+        fixGen30: newScene(
+          "<p>The water in the basement is getting pretty deep. The generator "
+          + "has been on the floor in the water up until this point. You manage to use "
+          + "all the strength you have left to lift the generator onto a work bench. "
+          + "You take a few things apart hoping to find an easy fix as the water is getting "
+          + "deeper and deeper. After trying a few little adjustments you try starting "
+          + "the generator. No luck.</p>",
+            "Continue trying to fix the generator, knowing it would get this water out of the basement fast.", "fixGen60",
+            "Give up on the generator and start bailing water with a bucket.", "lateBail"
+        ),
+        
+        bailWater60: newScene(
+          "<p>You have been bailing water now for what feels like an eternity. The storm has "
+          +"not let up at all, the water continues to leak in faster than you can bail it. You "
+          +"are completely worn out. The water is now reaching the top of the basement. All hope "
+          +"seems lost. All of a sudden you hear a loud noise and see a bright flash of light."
+          + " You close your eyes and shield your face from the light. </p>",
+            "Open your Eyes.", "openEyes"
+        ),
+        
+        fixGen60: newScene(
+          "<p>The water is now very deep and the generator is pretty much completely "
+          + "submerged at this point. There is only enough time to make a couple of "
+          + "small adjustments and hope that does the trick. It is time to see if "
+          + "the time spent on the generator was worth it. You try starting it up before "
+          + "it is all underwater and...nothing. The generator will not start. You "
+          + "have no choice but to try bailing some water with a bucket.</p>",
+            "Start bailing water as fast as you can.", "lateBail"
+        ),
+        
+        inspectCar: newScene(
+          "<p>You start to look over the car, looking for any major issues. Right away, " 
+          + "you notice that two of the tires are completely flat. You would not have "
+          + "made it far like this. Next, you take a look under the hood. The battery cables "
+          + "have come disconnected some how. After fixing both these issues, you hop in "
+          + "the car, turn the key, and it starts right up. But, which way should you drive?"
+          + " It is faster to go through the city, but there is likely to be more traffic. Through "
+          + "the country is a longer route but  it should be less people. You must decide quickly "
+          + "because the rain is getting really bad now.</p>",
+            "Take the country route.", "country",
+            "Head into the city.", "city"
+        ),
+        
+        tryStart: newScene(
+          "<p> You decide that it is best to risk it in an emergency. You jump into the "
+          + "car and try starting it. Nothing happens. You spend a few minutes just trying "
+          + "to start the car but over and over nothing happens, the car makes no noise. You "
+          + "are now starting to panic realizing you have just wasted a few minutes and the rain "
+          + "is starting to fall pretty hard. It is starting to accumulate on the ground. Is it better "
+          + "now to try to get the car running, having no idea what could be wrong with it, or is "
+          + "it better to just start running on foot, hoping you can outrun the storm?</p>",
+            "Take more time to try to fix the car. ", "inspectCar",
+            "Forget the car that may never run and head out on foot.", "run"
+        ),
+        
+        run: newScene(
+          "<p>You decide to leave the car behind, believing in your mind that it is a "
+          + "lost cause. Before long, however, the amount of water on the road is so bad "
+          + "that you can barely walk. All of a sudden, you are swept off your feet and are "
+          + "now floating along. The water is moving so fast, that you can barely keep your head "
+          + "above the water. You are completely worn out from your run. All hope "
+          + "seems lost. All of a sudden you hear a loud noise and see a bright flash of light."
+          + " You close your eyes and shield your face from the light.</p>",
+            "Open your eyes.", "openEyes"
+        ),
+        
+        country: newScene(
+          "<p>You decide that the best choice is to head out into the country in order "
+          + "to avoid any possible traffic jams. You believe you made the right decision "
+          + "since you are moving along pretty well and see no other traffic. But soon, "
+          + "the water is getting pretty deep and you can start to feel that your car is "
+          + "not handling very well. You look down and see that there is even water leaking "
+          + "in around your feet. You look back up. With sudden horror you notice that "
+          + "the bridge in front of you is completely washed out. You slam on the brakes "
+          + "but it is too late. All of a sudden you hear a loud noise and see a bright flash of light. "
+          + "You close your eyes and shield your face from the light. </p>",
+            "Open Your eyes.", "openEyes"
+        ),
+        
+        city: newScene(
+          "<p>You decide to head into the city. You know there is likely to be more people " 
+          + "but you feel it is safer than having to go into the country and over the rickety bridge that " 
+          + "crosses the river. You start heading into the city feeling good about your decision. But all "
+          + "off a sudden you see what you feared right in front of you, a massive traffic jam, "
+          + "caused by some sort of accident. Traffic is barely moving and the water is getting deep "
+          + "outside. It has even begun to leak into your car by your feet. You can see that on the "
+          + "other side of the traffic, you have a clear shot out of town, but water is "
+          + "coming in fast. Your car might even stall if you do not move soon. </p>",
+            "Stay in the car and hope you start moving quicker.", "stayCar",
+            "Make a run for it on foot, believing that the car will fill soon.", "run"
+        ),
+        
+        stayCar: newScene(
+          "<p>You decide that staying with your car is the right decision. As long as "
+          + "the traffic keeps moving, you will be able to get farther with the car. "
+          + "But as you wait, the water starts rising outside and pouring into the car "
+          + "faster and faster. All of a sudden your car stalls due to the water level "
+          + "rising so fast. You decide to try to make a run for it, but the water is "
+          + "flowing so fast you can't get your door open. As water continues to flow in, "
+          + "all hope seems lost. All of a sudden you hear a loud noise and see a bright" 
+          + "flash of light. You close your eyes and shield your face from the light.</p>",
+            "Open your eyes.", "openEyes"
+        ),
+        
+         lateBail: newScene(
+          "<p>After having no luck with the generator and after wasting lots of time trying to fix it. "
+          + "You start bailing water as fast as you can with what little energy you have left, "
+          + "but the water is already very high.The storm has "
+          + "not let up at all, the water continues to leak in faster than you can bail it. You "
+          + "are completely worn out. The water is now reaching the top of the basement. All hope "
+          + "seems lost. All of a sudden you hear a loud noise and see a bright flash of light. "
+          + " You close your eyes and shield your face from the light.</p>",
+            "Open your Eyes.", "openEyes"
+        ),
+        
+        openEyes: newScene(
+          "<p>You open your eyes. Your heart is beating fast and you are covered in sweat. "
+          + "You take a look around and see that you are still sitting in your favorite chair "
+          + "in front of your television. You realize that it all must have been a dream. "
+          + " The loud noise and flash that you heard had come from some movie that "
+          + "they were playing on television. A movie about chasing storms! "
+          + "You think to yourself how you are glad that today was a pretty boring day. "
+          + "You decide to get up and get a snack from the kitchen. But just as you enter "
+          + "the kitchen you hear a siren outside and the television starts to blare "
+          + "a loud warning alarm. You think to yourself, 'You gotta be kidding me!' </p>",
+            "Ignore the warnings and look for a good snack.", "ignoreWarnings",
+            "Head back into the living room to check out the television.", "checkTv"
+        )
+  };
+
+  const onPress = function(event) {
+    console.log (event);
+    if (event.key > 0 && event.key < 10) {
+      let choice = event.key - 1;
+        if (choice < 0) {
+          choice = choice + 10;
+    }
+    if (scenes[sceneId].choices.length > choice) {
+      sceneId = scenes[sceneId].choices[choice].onChoose;
+      updateDisplay();
+      sfxThunder.play();
+    }
+   }
+  };
+
+  const updateDisplay = function () {
+    let i = 0;
+    let text = "";
+    text = scenes[sceneId].description + "<ol>";
+    while ( i < scenes[sceneId].choices.length) {
+      text = text + "<li>" + scenes[sceneId].choices[i].label + "</li>";
+      i = i + 1;
+    }
+    output.innerHTML = text + "</ol>";
+  };
+
+  updateDisplay();
+
+  window.addEventListener('keydown', onPress, false);
+  window.addEventListener('mousedown', onPress, false);
+    
+      </script>
+      <footer>
+        <p>* Turn on Sound for best experience! *</p>
+        <p> Version 1.0 </p>
+      </footer>
+    </div>
+  </body>
+</html>
